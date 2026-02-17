@@ -1,0 +1,40 @@
+{
+  "name": "clawpay",
+  "version": "0.1.0",
+  "description": "Secure card vault with policy-gated payments for AI agents. Works as MCP server and OpenClaw plugin.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "clawpay": "./bin/cli.js"
+  },
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./mcp": "./dist/integrations/mcp-server.js",
+    "./openclaw": "./dist/integrations/openclaw-plugin.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/integrations/mcp-server.ts",
+    "start:mcp": "node dist/integrations/mcp-server.js",
+    "start:openclaw": "node dist/integrations/openclaw-plugin.js",
+    "init": "node dist/bin/cli.js init",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "keytar": "^7.9.0",
+    "yaml": "^2.3.0",
+    "zod": "^3.22.0",
+    "inquirer": "^9.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.7.0",
+    "vitest": "^1.6.0",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

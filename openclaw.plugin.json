@@ -1,0 +1,69 @@
+{
+  "id": "clawpay",
+  "name": "ClawPay",
+  "description": "Secure card vault with policy-gated payments for AI agents. Your agent asks, the bouncer decides.",
+  "kind": "tool",
+  "version": "0.1.0",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "auto_approve_under": {
+        "type": "number",
+        "default": 25,
+        "description": "Auto-approve payments under this amount (USD)"
+      },
+      "require_approval_above": {
+        "type": "number",
+        "default": 25,
+        "description": "Require human approval for payments above this amount"
+      },
+      "block_above": {
+        "type": "number",
+        "default": 1000,
+        "description": "Block payments above this amount entirely"
+      },
+      "daily_limit": {
+        "type": "number",
+        "default": 200,
+        "description": "Maximum total spending per day"
+      },
+      "monthly_limit": {
+        "type": "number",
+        "default": 2000,
+        "description": "Maximum total spending per month"
+      },
+      "currency": {
+        "type": "string",
+        "default": "USD",
+        "description": "Default currency"
+      },
+      "blocked_keywords": {
+        "type": "array",
+        "items": { "type": "string" },
+        "default": [],
+        "description": "Block payments containing these keywords"
+      },
+      "approval_method": {
+        "type": "string",
+        "enum": ["terminal", "webhook"],
+        "default": "terminal",
+        "description": "How to notify user for approval"
+      },
+      "approval_timeout": {
+        "type": "number",
+        "default": 300,
+        "description": "Seconds to wait for approval before auto-denying"
+      },
+      "approval_webhook_url": {
+        "type": "string",
+        "description": "Webhook URL for approval notifications (if method is webhook)"
+      }
+    },
+    "additionalProperties": false
+  },
+  "uiHints": {
+    "auto_approve_under": { "label": "Auto-approve under ($)" },
+    "block_above": { "label": "Hard block above ($)" },
+    "approval_webhook_url": { "sensitive": true }
+  }
+}

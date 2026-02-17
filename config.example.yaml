@@ -1,0 +1,58 @@
+# ClawPay Configuration
+# Copy this to ~/.clawpay/config.yaml and customize.
+
+vault:
+  encryption: aes-256-gcm
+  keyStorage: keychain  # keychain | file | env
+
+policies:
+  # Auto-approve payments under this amount (no human approval needed)
+  autoApproveUnder: 25.00
+
+  # Require human approval for payments above this amount
+  requireApprovalAbove: 25.00
+
+  # Hard block — deny any payment above this amount
+  blockAbove: 1000.00
+
+  # Maximum total spending per day
+  dailyLimit: 200.00
+
+  # Maximum total spending per month
+  monthlyLimit: 2000.00
+
+  # Default currency
+  currency: USD
+
+  # Block payments if description or merchant contains these keywords
+  blockedKeywords:
+    - gambling
+    - crypto
+    - adult
+
+  # Only allow payments to these merchants (leave empty to allow all)
+  # allowedMerchants:
+  #   - amazon.com
+  #   - shopify.com
+
+  # Block payments to these merchants
+  blockedMerchants: []
+
+approval:
+  # How to notify you when approval is needed
+  # terminal — CLI prompt (default, good for local dev)
+  # webhook  — POST to a URL (good for Slack bots, custom apps)
+  method: terminal
+
+  # Seconds to wait for approval before auto-denying
+  timeout: 300
+
+  # Webhook URL (only used if method is webhook)
+  # webhookUrl: https://your-app.com/clawpay/approve
+
+  # Slack webhook URL (only used if method is slack)
+  # slackWebhookUrl: https://hooks.slack.com/services/xxx
+
+logging:
+  enabled: true
+  path: ~/.clawpay/transactions.json
