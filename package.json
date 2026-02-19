@@ -1,6 +1,6 @@
 {
   "name": "clawpay",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Secure card vault with policy-gated payments for AI agents. Works as MCP server and OpenClaw plugin.",
   "type": "module",
   "license": "MIT",
