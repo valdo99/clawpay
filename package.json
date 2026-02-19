@@ -5,7 +5,7 @@
   "type": "module",
   "license": "MIT",
   "bin": {
-    "clawpay": "./dist/bin/cli.js"
+    "clawpay": "dist/bin/cli.js"
   },
   "main": "./dist/index.js",
   "exports": {
