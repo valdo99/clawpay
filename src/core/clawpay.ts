@@ -50,10 +50,17 @@ const DEFAULT_CONFIG: ClawPayConfig = {
  *
  * This is what the MCP server and OpenClaw plugin both talk to.
  */
+export type ApprovalCallback = (
+  payment: PaymentRequest,
+  policyResult: PolicyResult,
+  timeoutMs: number
+) => Promise<boolean>;
+
 export class ClawPay {
   private vault: Vault;
   private policy: PolicyEngine;
   private config: ClawPayConfig;
+  public onApproval?: ApprovalCallback;
 
   constructor(config?: Partial<ClawPayConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config } as ClawPayConfig;
@@ -125,11 +132,10 @@ export class ClawPay {
     }
 
     // Requires human approval
-    const approved = await requestApproval(
-      request,
-      policyResult,
-      this.config.approval
-    );
+    const timeoutMs = (this.config.approval.timeout || 300) * 1000;
+    const approved = this.onApproval
+      ? await this.onApproval(request, policyResult, timeoutMs)
+      : await requestApproval(request, policyResult, this.config.approval);
 
     if (!approved) {
       await this.logTransaction(request, policyResult, false, "human");

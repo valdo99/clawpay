@@ -45,9 +45,21 @@
       },
       "approval_method": {
         "type": "string",
-        "enum": ["terminal", "webhook"],
+        "enum": ["terminal", "webhook", "telegram", "whatsapp"],
         "default": "terminal",
         "description": "How to notify user for approval"
+      },
+      "telegram_bot_token": {
+        "type": "string",
+        "description": "Telegram bot token from @BotFather (required if method is telegram)"
+      },
+      "telegram_chat_id": {
+        "type": "string",
+        "description": "Telegram chat ID to send approval requests to"
+      },
+      "whatsapp_chat_id": {
+        "type": "string",
+        "description": "WhatsApp chat ID for approval messages (requires OpenClaw messaging)"
       },
       "approval_timeout": {
         "type": "number",
@@ -64,6 +76,7 @@
   "uiHints": {
     "auto_approve_under": { "label": "Auto-approve under ($)" },
     "block_above": { "label": "Hard block above ($)" },
-    "approval_webhook_url": { "sensitive": true }
+    "approval_webhook_url": { "sensitive": true },
+    "telegram_bot_token": { "sensitive": true }
   }
 }

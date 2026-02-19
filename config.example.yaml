@@ -53,6 +53,14 @@ approval:
   # Slack webhook URL (only used if method is slack)
   # slackWebhookUrl: https://hooks.slack.com/services/xxx
 
+  # Telegram bot token and chat ID (only used if method is telegram)
+  # Get a bot token from @BotFather on Telegram
+  # telegramBotToken: "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+  # telegramChatId: "123456789"
+
+  # WhatsApp (only works via OpenClaw plugin — requires OpenClaw's messaging layer)
+  # To use WhatsApp standalone, set method to webhook and point at your own bridge.
+
 logging:
   enabled: true
   path: ~/.clawpay/transactions.json

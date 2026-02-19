@@ -54,7 +54,7 @@ export interface ApprovalRequest {
   timestamp: number;
 }
 
-export type ApprovalMethod = "terminal" | "webhook" | "slack" | "callback";
+export type ApprovalMethod = "terminal" | "webhook" | "slack" | "callback" | "telegram" | "whatsapp";
 
 export interface ClawPayConfig {
   vault: {
@@ -67,6 +67,8 @@ export interface ClawPayConfig {
     timeout: number;
     webhookUrl?: string;
     slackWebhookUrl?: string;
+    telegramBotToken?: string;
+    telegramChatId?: string;
   };
   logging: {
     enabled: boolean;

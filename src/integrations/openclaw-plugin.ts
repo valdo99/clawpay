@@ -1,5 +1,8 @@
 import { ClawPay } from "../core/clawpay.js";
 import type { CardDetails, PaymentRequest } from "../types/index.js";
+import { telegramApproval } from "../approval/telegram.js";
+import { whatsappApproval } from "../approval/whatsapp.js";
+import type { SendMessageFn, WaitForReplyFn } from "../approval/whatsapp.js";
 
 /**
  * ClawPay OpenClaw Plugin
@@ -25,15 +28,31 @@ interface OpenClawPluginApi {
     },
     options?: { optional?: boolean }
   ): void;
+  registerCommand?(command: {
+    name: string;
+    description: string;
+    execute: (params: Record<string, unknown>) => Promise<void>;
+  }): void;
+  sendMessage?(chatId: string, text: string): Promise<void>;
+  waitForReply?(chatId: string, timeoutMs: number): Promise<string | null>;
   getConfig(): Record<string, unknown>;
 }
 
 export default function register(api: OpenClawPluginApi) {
   let clawpay: ClawPay | null = null;
+  const pendingApprovals = new Map<string, (approved: boolean) => void>();
 
   async function getClawPay(): Promise<ClawPay> {
     if (!clawpay) {
       const config = api.getConfig();
+      const approvalMethod = (config.approval_method as string) ?? "terminal";
+
+      // Telegram works natively through the router.
+      // WhatsApp requires OpenClaw's messaging layer — use callback method
+      // and handle it in the request_card execute override.
+      const effectiveMethod =
+        approvalMethod === "whatsapp" ? "callback" : approvalMethod;
+
       clawpay = new ClawPay({
         policies: {
           autoApproveUnder: (config.auto_approve_under as number) ?? 25,
@@ -45,12 +64,32 @@ export default function register(api: OpenClawPluginApi) {
           currency: (config.currency as string) ?? "USD",
         },
         approval: {
-          method: (config.approval_method as "terminal" | "webhook") ?? "terminal",
+          method: effectiveMethod as any,
           timeout: (config.approval_timeout as number) ?? 300,
           webhookUrl: config.approval_webhook_url as string | undefined,
+          telegramBotToken: config.telegram_bot_token as string | undefined,
+          telegramChatId: config.telegram_chat_id as string | undefined,
         },
       } as any);
       await clawpay.init();
+
+      // Wire up WhatsApp approval via OpenClaw's messaging layer
+      if (approvalMethod === "whatsapp") {
+        if (!api.sendMessage || !api.waitForReply) {
+          throw new Error(
+            "WhatsApp approval requires OpenClaw's messaging API (sendMessage/waitForReply)."
+          );
+        }
+        const whatsappChatId = config.whatsapp_chat_id as string;
+        if (!whatsappChatId) {
+          throw new Error("whatsapp_chat_id is required for WhatsApp approval.");
+        }
+        clawpay.onApproval = async (payment, policyResult, timeoutMs) => {
+          const sendFn: SendMessageFn = (text) => api.sendMessage!(whatsappChatId, text);
+          const waitFn: WaitForReplyFn = (ms) => api.waitForReply!(whatsappChatId, ms);
+          return whatsappApproval(payment, policyResult, sendFn, waitFn, timeoutMs);
+        };
+      }
     }
     return clawpay;
   }
@@ -87,6 +126,9 @@ Call this BEFORE filling in any payment form on a website.`,
       },
       async execute(_callId: string, params: Record<string, unknown>) {
         const cp = await getClawPay();
+        const config = api.getConfig();
+        const approvalMethod = (config.approval_method as string) ?? "terminal";
+
         const result = await cp.requestCard({
           amount: params.amount as number,
           merchant: params.merchant as string,
@@ -152,4 +194,34 @@ Call this BEFORE filling in any payment form on a website.`,
     },
     { optional: true }
   );
+
+  // --- Slash commands for manual approval (telegram/whatsapp) ---
+
+  if (api.registerCommand) {
+    api.registerCommand({
+      name: "/clawpay_approve",
+      description: "Manually approve a pending ClawPay payment",
+      async execute(params: Record<string, unknown>) {
+        const id = params.id as string;
+        const resolver = pendingApprovals.get(id);
+        if (resolver) {
+          resolver(true);
+          pendingApprovals.delete(id);
+        }
+      },
+    });
+
+    api.registerCommand({
+      name: "/clawpay_deny",
+      description: "Manually deny a pending ClawPay payment",
+      async execute(params: Record<string, unknown>) {
+        const id = params.id as string;
+        const resolver = pendingApprovals.get(id);
+        if (resolver) {
+          resolver(false);
+          pendingApprovals.delete(id);
+        }
+      },
+    });
+  }
 }
