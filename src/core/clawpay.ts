@@ -12,12 +12,12 @@ import type {
   PaymentRequest,
   PolicyResult,
   TransactionLog,
-  ClawPayConfig,
+  ClawPayerConfig,
 } from "../types/index.js";
 
-const CONFIG_FILE = join(homedir(), ".clawpay", "config.yaml");
+const CONFIG_FILE = join(homedir(), ".clawpayer", "config.yaml");
 
-const DEFAULT_CONFIG: ClawPayConfig = {
+const DEFAULT_CONFIG: ClawPayerConfig = {
   vault: {
     encryption: "aes-256-gcm",
     keyStorage: "keychain",
@@ -37,12 +37,12 @@ const DEFAULT_CONFIG: ClawPayConfig = {
   },
   logging: {
     enabled: true,
-    path: join(homedir(), ".clawpay", "transactions.json"),
+    path: join(homedir(), ".clawpayer", "transactions.json"),
   },
 };
 
 /**
- * ClawPay — the core engine.
+ * ClawPayer — the core engine.
  *
  * Ties together the vault (encrypted card storage),
  * the policy engine (rules evaluation), and the approval
@@ -56,29 +56,29 @@ export type ApprovalCallback = (
   timeoutMs: number
 ) => Promise<boolean>;
 
-export class ClawPay {
+export class ClawPayer {
   private vault: Vault;
   private policy: PolicyEngine;
-  private config: ClawPayConfig;
+  private config: ClawPayerConfig;
   public onApproval?: ApprovalCallback;
 
-  constructor(config?: Partial<ClawPayConfig>) {
-    this.config = { ...DEFAULT_CONFIG, ...config } as ClawPayConfig;
+  constructor(config?: Partial<ClawPayerConfig>) {
+    this.config = { ...DEFAULT_CONFIG, ...config } as ClawPayerConfig;
     this.vault = new Vault(this.config.vault.keyStorage);
     this.policy = new PolicyEngine(this.config.policies);
   }
 
   /**
-   * Load ClawPay from the config file.
+   * Load ClawPayer from the config file.
    */
-  static async load(): Promise<ClawPay> {
+  static async load(): Promise<ClawPayer> {
     if (!existsSync(CONFIG_FILE)) {
-      return new ClawPay();
+      return new ClawPayer();
     }
 
     const raw = await readFile(CONFIG_FILE, "utf-8");
-    const config: ClawPayConfig = parseYaml(raw);
-    return new ClawPay(config);
+    const config: ClawPayerConfig = parseYaml(raw);
+    return new ClawPayer(config);
   }
 
   /**
@@ -112,7 +112,7 @@ export class ClawPay {
     // Check vault has a card
     const hasCard = await this.vault.hasCard();
     if (!hasCard) {
-      return { approved: false, reason: "No card stored. Run `clawpay add-card` first." };
+      return { approved: false, reason: "No card stored. Run `clawpayer add-card` first." };
     }
 
     // Evaluate policy

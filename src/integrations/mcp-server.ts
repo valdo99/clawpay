@@ -4,12 +4,12 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { ClawPay } from "../core/clawpay.js";
+import { ClawPayer } from "../core/clawpay.js";
 
 /**
- * ClawPay MCP Server
+ * ClawPayer MCP Server
  *
- * Exposes ClawPay as a Model Context Protocol server.
+ * Exposes ClawPayer as a Model Context Protocol server.
  * Any MCP-compatible agent (Claude, Cursor, OpenClaw, etc.)
  * can connect to this and request card details for payments.
  *
@@ -19,7 +19,7 @@ import { ClawPay } from "../core/clawpay.js";
 
 const server = new Server(
   {
-    name: "clawpay",
+    name: "clawpayer",
     version: "0.1.0",
   },
   {
@@ -29,7 +29,7 @@ const server = new Server(
   }
 );
 
-let clawpay: ClawPay;
+let clawpayer: ClawPayer;
 
 // --- Tool Definitions ---
 
@@ -110,7 +110,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         currency?: string;
       };
 
-      const result = await clawpay.requestCard({
+      const result = await clawpayer.requestCard({
         amount,
         merchant,
         description,
@@ -150,7 +150,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     case "get_payment_policy": {
-      const policy = clawpay.getPolicy();
+      const policy = clawpayer.getPolicy();
       return {
         content: [
           {
@@ -171,7 +171,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     case "check_card_status": {
-      const hasCard = await clawpay.hasCard();
+      const hasCard = await clawpayer.hasCard();
       return {
         content: [
           {
@@ -180,7 +180,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               cardStored: hasCard,
               message: hasCard
                 ? "A card is stored and ready to use."
-                : "No card stored. The user needs to run `clawpay add-card` first.",
+                : "No card stored. The user needs to run `clawpayer add-card` first.",
             }),
           },
         ],
@@ -195,13 +195,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 // --- Start ---
 
 async function main() {
-  clawpay = await ClawPay.load();
+  clawpayer = await ClawPayer.load();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("🦞 ClawPay MCP server running on stdio");
+  console.error("🦞 ClawPayer MCP server running on stdio");
 }
 
 main().catch((err) => {
-  console.error("Failed to start ClawPay MCP server:", err);
+  console.error("Failed to start ClawPayer MCP server:", err);
   process.exit(1);
 });

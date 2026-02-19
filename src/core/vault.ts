@@ -8,9 +8,9 @@ import type { CardDetails, EncryptedPayload } from "../types/index.js";
 const ALGORITHM = "aes-256-gcm";
 const KEY_LENGTH = 32;
 const IV_LENGTH = 16;
-const CLAWPAY_DIR = join(homedir(), ".clawpay");
-const VAULT_FILE = join(CLAWPAY_DIR, "vault.enc");
-const KEY_SERVICE = "clawpay";
+const CLAWPAYER_DIR = join(homedir(), ".clawpayer");
+const VAULT_FILE = join(CLAWPAYER_DIR, "vault.enc");
+const KEY_SERVICE = "clawpayer";
 const KEY_ACCOUNT = "vault-key";
 
 /**
@@ -34,8 +34,8 @@ export class Vault {
    * if one doesn't already exist.
    */
   async init(): Promise<void> {
-    if (!existsSync(CLAWPAY_DIR)) {
-      await mkdir(CLAWPAY_DIR, { recursive: true, mode: 0o700 });
+    if (!existsSync(CLAWPAYER_DIR)) {
+      await mkdir(CLAWPAYER_DIR, { recursive: true, mode: 0o700 });
     }
 
     const existingKey = await this.getKey();
@@ -51,7 +51,7 @@ export class Vault {
   async storeCard(card: CardDetails): Promise<void> {
     const key = await this.getKey();
     if (!key) {
-      throw new Error("Vault not initialized. Run `clawpay init` first.");
+      throw new Error("Vault not initialized. Run `clawpayer init` first.");
     }
 
     const encrypted = this.encrypt(JSON.stringify(card), key);
@@ -67,11 +67,11 @@ export class Vault {
   async getCard(): Promise<CardDetails> {
     const key = await this.getKey();
     if (!key) {
-      throw new Error("Vault not initialized. Run `clawpay init` first.");
+      throw new Error("Vault not initialized. Run `clawpayer init` first.");
     }
 
     if (!existsSync(VAULT_FILE)) {
-      throw new Error("No card stored. Run `clawpay add-card` first.");
+      throw new Error("No card stored. Run `clawpayer add-card` first.");
     }
 
     const raw = await readFile(VAULT_FILE, "utf-8");
@@ -154,7 +154,7 @@ export class Vault {
       case "env":
         console.log(
           `\nSet this environment variable to use the vault:\n` +
-            `  export CLAWPAY_KEY=${key.toString("hex")}\n` +
+            `  export CLAWPAYER_KEY=${key.toString("hex")}\n` +
             `\nStore it somewhere safe. If you lose it, your vault is gone.\n`
         );
         break;
@@ -190,14 +190,14 @@ export class Vault {
   }
 
   private async getKeyFromFile(): Promise<Buffer | null> {
-    const keyFile = join(CLAWPAY_DIR, ".key");
+    const keyFile = join(CLAWPAYER_DIR, ".key");
     if (!existsSync(keyFile)) return null;
     const hex = await readFile(keyFile, "utf-8");
     return Buffer.from(hex.trim(), "hex");
   }
 
   private async storeKeyInFile(key: Buffer): Promise<void> {
-    const keyFile = join(CLAWPAY_DIR, ".key");
+    const keyFile = join(CLAWPAYER_DIR, ".key");
     await writeFile(keyFile, key.toString("hex"), {
       encoding: "utf-8",
       mode: 0o600,
@@ -205,7 +205,7 @@ export class Vault {
   }
 
   private getKeyFromEnv(): Promise<Buffer | null> {
-    const hex = process.env.CLAWPAY_KEY;
+    const hex = process.env.CLAWPAYER_KEY;
     return Promise.resolve(hex ? Buffer.from(hex, "hex") : null);
   }
 }

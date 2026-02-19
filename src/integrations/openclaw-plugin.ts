@@ -1,13 +1,13 @@
-import { ClawPay } from "../core/clawpay.js";
+import { ClawPayer } from "../core/clawpay.js";
 import type { CardDetails, PaymentRequest } from "../types/index.js";
 import { telegramApproval } from "../approval/telegram.js";
 import { whatsappApproval } from "../approval/whatsapp.js";
 import type { SendMessageFn, WaitForReplyFn } from "../approval/whatsapp.js";
 
 /**
- * ClawPay OpenClaw Plugin
+ * ClawPayer OpenClaw Plugin
  *
- * Registers ClawPay tools within the OpenClaw agent framework.
+ * Registers ClawPayer tools within the OpenClaw agent framework.
  * When installed as an OpenClaw extension, Moltbot and other
  * OpenClaw agents can request card details through the policy gate.
  *
@@ -39,11 +39,11 @@ interface OpenClawPluginApi {
 }
 
 export default function register(api: OpenClawPluginApi) {
-  let clawpay: ClawPay | null = null;
+  let clawpayer: ClawPayer | null = null;
   const pendingApprovals = new Map<string, (approved: boolean) => void>();
 
-  async function getClawPay(): Promise<ClawPay> {
-    if (!clawpay) {
+  async function getClawPayer(): Promise<ClawPayer> {
+    if (!clawpayer) {
       const config = api.getConfig();
       const approvalMethod = (config.approval_method as string) ?? "terminal";
 
@@ -53,7 +53,7 @@ export default function register(api: OpenClawPluginApi) {
       const effectiveMethod =
         approvalMethod === "whatsapp" ? "callback" : approvalMethod;
 
-      clawpay = new ClawPay({
+      clawpayer = new ClawPayer({
         policies: {
           autoApproveUnder: (config.auto_approve_under as number) ?? 25,
           requireApprovalAbove: (config.require_approval_above as number) ?? 25,
@@ -71,7 +71,7 @@ export default function register(api: OpenClawPluginApi) {
           telegramChatId: config.telegram_chat_id as string | undefined,
         },
       } as any);
-      await clawpay.init();
+      await clawpayer.init();
 
       // Wire up WhatsApp approval via OpenClaw's messaging layer
       if (approvalMethod === "whatsapp") {
@@ -84,14 +84,14 @@ export default function register(api: OpenClawPluginApi) {
         if (!whatsappChatId) {
           throw new Error("whatsapp_chat_id is required for WhatsApp approval.");
         }
-        clawpay.onApproval = async (payment, policyResult, timeoutMs) => {
+        clawpayer.onApproval = async (payment, policyResult, timeoutMs) => {
           const sendFn: SendMessageFn = (text) => api.sendMessage!(whatsappChatId, text);
           const waitFn: WaitForReplyFn = (ms) => api.waitForReply!(whatsappChatId, ms);
           return whatsappApproval(payment, policyResult, sendFn, waitFn, timeoutMs);
         };
       }
     }
-    return clawpay;
+    return clawpayer;
   }
 
   // --- request_card tool ---
@@ -125,7 +125,7 @@ Call this BEFORE filling in any payment form on a website.`,
         required: ["amount", "merchant", "description"],
       },
       async execute(_callId: string, params: Record<string, unknown>) {
-        const cp = await getClawPay();
+        const cp = await getClawPayer();
         const config = api.getConfig();
         const approvalMethod = (config.approval_method as string) ?? "terminal";
 
@@ -180,7 +180,7 @@ Call this BEFORE filling in any payment form on a website.`,
         properties: {},
       },
       async execute(_callId: string, _params: Record<string, unknown>) {
-        const cp = await getClawPay();
+        const cp = await getClawPayer();
         const policy = cp.getPolicy();
         return {
           content: [
@@ -199,8 +199,8 @@ Call this BEFORE filling in any payment form on a website.`,
 
   if (api.registerCommand) {
     api.registerCommand({
-      name: "/clawpay_approve",
-      description: "Manually approve a pending ClawPay payment",
+      name: "/clawpayer_approve",
+      description: "Manually approve a pending ClawPayer payment",
       async execute(params: Record<string, unknown>) {
         const id = params.id as string;
         const resolver = pendingApprovals.get(id);
@@ -212,8 +212,8 @@ Call this BEFORE filling in any payment form on a website.`,
     });
 
     api.registerCommand({
-      name: "/clawpay_deny",
-      description: "Manually deny a pending ClawPay payment",
+      name: "/clawpayer_deny",
+      description: "Manually deny a pending ClawPayer payment",
       async execute(params: Record<string, unknown>) {
         const id = params.id as string;
         const resolver = pendingApprovals.get(id);

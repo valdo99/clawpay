@@ -17,7 +17,7 @@ export async function webhookApproval(
   timeoutMs: number = 300_000
 ): Promise<boolean> {
   const payload = {
-    type: "clawpay_approval_request",
+    type: "clawpayer_approval_request",
     payment: {
       amount: payment.amount,
       merchant: payment.merchant,

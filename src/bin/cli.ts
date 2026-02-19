@@ -7,10 +7,10 @@ import { homedir } from "node:os";
 import { createInterface } from "node:readline";
 import { stringify as toYaml } from "yaml";
 import { Vault } from "../core/vault.js";
-import type { ClawPayConfig } from "../types/index.js";
+import type { ClawPayerConfig } from "../types/index.js";
 
-const CLAWPAY_DIR = join(homedir(), ".clawpay");
-const CONFIG_FILE = join(CLAWPAY_DIR, "config.yaml");
+const CLAWPAYER_DIR = join(homedir(), ".clawpayer");
+const CONFIG_FILE = join(CLAWPAYER_DIR, "config.yaml");
 
 function ask(rl: ReturnType<typeof createInterface>, question: string): Promise<string> {
   return new Promise((resolve) => {
@@ -19,7 +19,7 @@ function ask(rl: ReturnType<typeof createInterface>, question: string): Promise<
 }
 
 async function init() {
-  console.log("\n🦞 ClawPay Setup\n");
+  console.log("\n🦞 ClawPayer Setup\n");
   console.log("This will create your encrypted card vault and payment policies.\n");
 
   const vault = new Vault("keychain");
@@ -27,7 +27,7 @@ async function init() {
   console.log("✅ Vault initialized (encryption key generated)\n");
 
   if (!existsSync(CONFIG_FILE)) {
-    const defaultConfig: ClawPayConfig = {
+    const defaultConfig: ClawPayerConfig = {
       vault: {
         encryption: "aes-256-gcm",
         keyStorage: "keychain",
@@ -47,7 +47,7 @@ async function init() {
       },
       logging: {
         enabled: true,
-        path: join(CLAWPAY_DIR, "transactions.json"),
+        path: join(CLAWPAYER_DIR, "transactions.json"),
       },
     };
 
@@ -63,7 +63,7 @@ async function init() {
 }
 
 async function addCard() {
-  console.log("\n🦞 ClawPay — Add Card\n");
+  console.log("\n🦞 ClawPayer — Add Card\n");
   console.log("Your card details will be encrypted and stored locally.");
   console.log("They never leave this machine.\n");
 
@@ -104,21 +104,21 @@ async function addCard() {
     });
 
     console.log("\n✅ Card encrypted and stored.");
-    console.log("   Your agents can now request it through ClawPay.\n");
+    console.log("   Your agents can now request it through ClawPayer.\n");
   } finally {
     rl.close();
   }
 }
 
 async function status() {
-  console.log("\n🦞 ClawPay Status\n");
+  console.log("\n🦞 ClawPayer Status\n");
 
   const vault = new Vault("keychain");
   const hasCard = await vault.hasCard();
 
   console.log(`Vault:  ${hasCard ? "✅ Card stored" : "❌ No card stored"}`);
   console.log(`Config: ${existsSync(CONFIG_FILE) ? "✅ Found" : "❌ Not found"}`);
-  console.log(`Dir:    ${CLAWPAY_DIR}\n`);
+  console.log(`Dir:    ${CLAWPAYER_DIR}\n`);
 }
 
 // --- CLI Router ---
@@ -137,16 +137,16 @@ switch (command) {
     break;
   default:
     console.log(`
-🦞 ClawPay — Payment gateway for AI agents
+🦞 ClawPayer — Payment gateway for AI agents
 
 Usage:
-  clawpay init        Initialize vault and create default config
-  clawpay add-card    Store a credit card in the encrypted vault
-  clawpay status      Check vault and config status
+  clawpayer init        Initialize vault and create default config
+  clawpayer add-card    Store a credit card in the encrypted vault
+  clawpayer status      Check vault and config status
 
 MCP Server:
-  clawpay serve       Start the MCP server (stdio transport)
+  clawpayer serve       Start the MCP server (stdio transport)
 
-Config: ~/.clawpay/config.yaml
+Config: ~/.clawpayer/config.yaml
     `);
 }

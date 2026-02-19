@@ -19,7 +19,7 @@ export async function telegramApproval(
   const currency = payment.currency || "USD";
 
   const text = [
-    "🔔 *ClawPay Approval Request*",
+    "🔔 *ClawPayer Approval Request*",
     "",
     `*Amount:* ${currency} ${payment.amount.toFixed(2)}`,
     `*Merchant:* ${payment.merchant}`,

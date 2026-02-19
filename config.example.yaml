@@ -1,5 +1,5 @@
-# ClawPay Configuration
-# Copy this to ~/.clawpay/config.yaml and customize.
+# ClawPayer Configuration
+# Copy this to ~/.clawpayer/config.yaml and customize.
 
 vault:
   encryption: aes-256-gcm
@@ -48,7 +48,7 @@ approval:
   timeout: 300
 
   # Webhook URL (only used if method is webhook)
-  # webhookUrl: https://your-app.com/clawpay/approve
+  # webhookUrl: https://your-app.com/clawpayer/approve
 
   # Slack webhook URL (only used if method is slack)
   # slackWebhookUrl: https://hooks.slack.com/services/xxx
@@ -63,4 +63,4 @@ approval:
 
 logging:
   enabled: true
-  path: ~/.clawpay/transactions.json
+  path: ~/.clawpayer/transactions.json

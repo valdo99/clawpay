@@ -8,12 +8,12 @@ import type {
   PaymentRequest,
   PolicyResult,
   TransactionLog,
-  ClawPayConfig,
+  ClawPayerConfig,
 } from "../types/index.js";
 
-const CLAWPAY_DIR = join(homedir(), ".clawpay");
-const CONFIG_FILE = join(CLAWPAY_DIR, "config.yaml");
-const LOG_FILE = join(CLAWPAY_DIR, "transactions.json");
+const CLAWPAYER_DIR = join(homedir(), ".clawpayer");
+const CONFIG_FILE = join(CLAWPAYER_DIR, "config.yaml");
+const LOG_FILE = join(CLAWPAYER_DIR, "transactions.json");
 
 const DEFAULT_POLICY: PolicyConfig = {
   autoApproveUnder: 25.0,
@@ -50,7 +50,7 @@ export class PolicyEngine {
     }
 
     const raw = await readFile(CONFIG_FILE, "utf-8");
-    const config: ClawPayConfig = parseYaml(raw);
+    const config: ClawPayerConfig = parseYaml(raw);
     return new PolicyEngine(config.policies);
   }
 

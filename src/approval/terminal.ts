@@ -18,7 +18,7 @@ export async function terminalApproval(
   });
 
   console.log("\n╔══════════════════════════════════════════╗");
-  console.log("║       🦞 CLAWPAY APPROVAL REQUEST       ║");
+  console.log("║       🦞 CLAWPAYER APPROVAL REQUEST       ║");
   console.log("╠══════════════════════════════════════════╣");
   console.log(`║  Amount:   $${payment.amount.toFixed(2).padEnd(29)}║`);
   console.log(`║  Merchant: ${payment.merchant.slice(0, 29).padEnd(29)}║`);

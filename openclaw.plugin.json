@@ -1,6 +1,6 @@
 {
-  "id": "clawpay",
-  "name": "ClawPay",
+  "id": "clawpayer",
+  "name": "ClawPayer",
   "description": "Secure card vault with policy-gated payments for AI agents. Your agent asks, the bouncer decides.",
   "kind": "tool",
   "version": "0.1.0",

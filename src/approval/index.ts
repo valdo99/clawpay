@@ -1,4 +1,4 @@
-import type { PaymentRequest, PolicyResult, ClawPayConfig } from "../types/index.js";
+import type { PaymentRequest, PolicyResult, ClawPayerConfig } from "../types/index.js";
 import { terminalApproval } from "./terminal.js";
 import { webhookApproval } from "./webhook.js";
 import { telegramApproval } from "./telegram.js";
@@ -9,7 +9,7 @@ import { telegramApproval } from "./telegram.js";
 export async function requestApproval(
   payment: PaymentRequest,
   policyResult: PolicyResult,
-  config: ClawPayConfig["approval"]
+  config: ClawPayerConfig["approval"]
 ): Promise<boolean> {
   const timeoutMs = (config.timeout || 300) * 1000;
 

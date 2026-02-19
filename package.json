@@ -1,5 +1,5 @@
 {
-  "name": "@valdo/clawpay",
+  "name": "@clawpayer/cli",
   "version": "0.1.1",
   "description": "Secure card vault with policy-gated payments for AI agents. Works as MCP server and OpenClaw plugin.",
   "keywords": [
@@ -24,7 +24,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "clawpay": "dist/bin/cli.js"
+    "clawpayer": "dist/bin/cli.js"
   },
   "scripts": {
     "build": "tsc",

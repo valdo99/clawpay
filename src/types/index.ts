@@ -56,7 +56,7 @@ export interface ApprovalRequest {
 
 export type ApprovalMethod = "terminal" | "webhook" | "slack" | "callback" | "telegram" | "whatsapp";
 
-export interface ClawPayConfig {
+export interface ClawPayerConfig {
   vault: {
     encryption: "aes-256-gcm";
     keyStorage: "keychain" | "file" | "env";
