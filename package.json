@@ -5,7 +5,7 @@
   "type": "module",
   "license": "MIT",
   "bin": {
-    "clawpay": "./bin/cli.js"
+    "clawpay": "./dist/bin/cli.js"
   },
   "main": "./dist/index.js",
   "exports": {
@@ -19,6 +19,7 @@
     "start:mcp": "node dist/integrations/mcp-server.js",
     "start:openclaw": "node dist/integrations/openclaw-plugin.js",
     "init": "node dist/bin/cli.js init",
+    "prepublishOnly": "tsc",
     "test": "vitest"
   },
   "dependencies": {
