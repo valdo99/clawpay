@@ -1,17 +1,30 @@
 {
-  "name": "clawpay",
+  "name": "@valdo/clawpay",
   "version": "0.1.1",
   "description": "Secure card vault with policy-gated payments for AI agents. Works as MCP server and OpenClaw plugin.",
-  "type": "module",
-  "license": "MIT",
-  "bin": {
-    "clawpay": "dist/bin/cli.js"
+  "keywords": [
+    "\"ai-agents\""
+  ],
+  "homepage": "https://github.com/valdo99/clawpay#readme",
+  "bugs": {
+    "url": "https://github.com/valdo99/clawpay/issues"
   },
-  "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/valdo99/clawpay.git"
+  },
+  "license": "MIT",
+  "author": "valdo99",
+  "type": "module",
   "exports": {
     ".": "./dist/index.js",
     "./mcp": "./dist/integrations/mcp-server.js",
     "./openclaw": "./dist/integrations/openclaw-plugin.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "clawpay": "dist/bin/cli.js"
   },
   "scripts": {
     "build": "tsc",
